@@ -2,8 +2,8 @@
 
 module.exports = {
     DEFECT_STATUS: {
-        GOOD: 0,
-        FAILED: 1,
-        Third: 3,
+        PENDING: 1,
+        IN_PROCESS: 2,
+        COMPLETED: 3,
     },
 }

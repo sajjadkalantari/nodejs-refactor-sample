@@ -156,7 +156,7 @@ class defectInfo {
 
     async setDefectStatus(machineId, defect_time, status) {
         try {
-            
+
             let result = await defectRepository.updateDefect(machineId, defect_time, status);
 
             if (status == Constants.DEFECT_STATUS.Third && result == 1) {
@@ -262,45 +262,16 @@ class defectInfo {
 
     async getAllDefect() {
         try {
-            let allDefect = {}
 
-            return dbConnecter.table('defect')
-                .join('worker_registry', 'defect.personal_number', '=', 'worker_registry.personal_number')
-                .select()
-                .where({ 'defect.status': 1 })
-                .then(async (result) => {
-                    allDefect["pending"] = result
-                    console.log(result.length)
-                    return dbConnecter.table('defect')
-                        .join('worker_registry', 'defect.personal_number', '=', 'worker_registry.personal_number')
-                        .select()
-                        .where({ 'defect.status': 2 })
-                        .then(async (result) => {
-                            allDefect["in_process"] = result
-                            console.log(result.length)
+            let allDefects = await defectRepository.getAll();
 
-                            return dbConnecter.table('defect')
-                                .join('worker_registry', 'defect.personal_number', '=', 'worker_registry.personal_number')
-                                .select()
-                                .where({ 'defect.status': 3 })
-                                .then(async (result) => {
-                                    allDefect["completed"] = result
-                                    console.log(result.length)
+            let result = {
+                pending: allDefects.filter(m => m.status === Constants.DEFECT_STATUS.PENDING),
+                in_process: allDefects.filter(m => m.status === Constants.DEFECT_STATUS.IN_PROCESS),
+                completed: allDefects.filter(m => m.status === Constants.DEFECT_STATUS.COMPLETED),
+            };
 
-                                    return allDefect;
-                                })
-                        }).catch((error) => {
-                            logger.log({
-                                level: 'error',
-                                message: error.toString(),
-                            })
-                            let result = {}
-                            result["error"] = {}
-                            result["error"]["code"] = 500
-                            result["error"]["message"] = error.toString()
-                            return result
-                        })
-                })
+            return result;
         } catch (error) {
             logger.log({
                 level: 'error',

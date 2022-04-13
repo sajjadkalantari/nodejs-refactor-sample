@@ -124,31 +124,22 @@ class defectInfo {
 
     async getDefectStatus(machineId) {
         try {
-            let machineExist = (await dbConnecter.table('machine').where({ 'machine_id': machineId }).count())[0].count
 
-            if (machineExist != 1) {
+            //check machine exist
+            let machine = await machineRepository.getMachineById(machineId);
+
+            if (!machine) {
                 let result = {}
                 result["error"] = {}
                 result["error"]["code"] = 400
                 result["error"]["message"] = "Machine Id doesn't exist"
                 return result
             }
-            return dbConnecter.table('defect')
-                .where({ 'machine_id': machineId })
-                .orderBy('defect_time', 'desc')
-                .then(async (result) => {
-                    return result[0]
-                }).catch((error) => {
-                    logger.log({
-                        level: 'error',
-                        message: error.toString(),
-                    })
-                    let result = {}
-                    result["error"] = {}
-                    result["error"]["code"] = 500
-                    result["error"]["message"] = error.toString()
-                    return result
-                })
+
+            //get most recent defect
+            let lastDefect = await defectRepository.getMostRecentDefect(machineId);
+            return lastDefect;
+
         } catch (error) {
             logger.log({
                 level: 'error',

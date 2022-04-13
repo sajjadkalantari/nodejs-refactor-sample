@@ -7,7 +7,7 @@ const { DefectRepository } = require('../repositories/defect-repository');
 const { WorkerRegisteryRepository } = require('../repositories/worker-registery-repository');
 const { ClientError } = require('../utils/error')
 
-class defectInfoService {
+class DefectInfoService {
 
     constructor() {
         this.mI = new machineInfo();
@@ -103,5 +103,5 @@ class defectInfoService {
 }
 
 module.exports = {
-    defectInfoService
+    DefectInfoService
 }

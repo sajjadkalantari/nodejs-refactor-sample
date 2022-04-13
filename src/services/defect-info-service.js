@@ -3,9 +3,9 @@ const { logger } = require("./logger");
 const moment = require('moment-timezone');
 const { machineInfo } = require("./machine");
 
-const machineRepository = require('../repositories/machine-repository');
-const defectRepository = require('../repositories/defect-repository');
-const workerRegisteryRepository = require('../repositories/worker-registery-repository');
+const { MachineRepository } = require('../repositories/machine-repository');
+const { DefectRepository } = require('../repositories/defect-repository');
+const { WorkerRegisteryRepository } = require('../repositories/worker-registery-repository');
 const Constants = require('../utils/constants');
 const { ClientError } = require('../utils/error')
 
@@ -13,13 +13,21 @@ class defectInfoService {
 
     constructor() {
         this.mI = new machineInfo();
-     }
+        this.defectRepository = new DefectRepository();
+        this.machineRepository = new MachineRepository();
+        this.workerRegisteryRepository = new WorkerRegisteryRepository();
+    }
 
-    async getDefectInfo(machineId) {
-        //check machine exist
+    async ValidateMachineExist(machineId) {
         let machine = await machineRepository.getMachineById(machineId);
         if (!machine)
             throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Machine Id doesn't exist");
+
+    }
+
+    async getDefectInfo(machineId) {
+        //check machine exist
+        await ValidateMachineExist(machineId);
 
         //get defect info
         let defect = await defectRepository.getDefectByMachineId(machineId);
@@ -27,16 +35,13 @@ class defectInfoService {
     }
 
     async setDefect(personalNumber, description, machineId) {
+        //check machine exist
+        await ValidateMachineExist(machineId);
 
         // check worker registery exist
         let workerRegistery = await workerRegisteryRepository.getWorkerByPersonalNumber(personalNumber);
         if (!workerRegistery)
             throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Invalid personal number");
-
-        //check machine exist
-        let machine = await machineRepository.getMachineById(machineId);
-        if (!machine)
-            throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Invalid machine id");
 
         //creating new defect
         const model = {
@@ -52,9 +57,7 @@ class defectInfoService {
 
     async getDefectStatus(machineId) {
         //check machine exist
-        let machine = await machineRepository.getMachineById(machineId);
-        if (!machine)
-            throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Machine Id doesn't exist");
+        await ValidateMachineExist(machineId);
 
         //get most recent defect
         let lastDefect = await defectRepository.getMostRecentDefect(machineId);
@@ -62,7 +65,6 @@ class defectInfoService {
     }
 
     async setDefectStatus(machineId, defect_time, status) {
-
         //update defect status
         let result = await defectRepository.updateDefect(machineId, defect_time, status);
 
@@ -87,7 +89,6 @@ class defectInfoService {
     }
 
     async getAllDefect() {
-        
         //get all defects
         let allDefects = await defectRepository.getAll();
 

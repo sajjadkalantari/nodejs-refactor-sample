@@ -156,10 +156,46 @@ class defectInfo {
 
     async setDefectStatus(machineId, defect_time, status) {
         try {
-            console.log(dbConnecter.table('defect')
-                .update({ 'status': status })
-                .where({ 'machine_id': machineId })
-                .andWhere({ 'defect_time': defect_time }).toString())
+            
+            let result = await defectRepository.updateDefect(machineId, defect_time, status);
+
+            if (status == Constants.DEFECT_STATUS.Third && result == 1) {
+                let result = await mI.setMachineStatus(machineId, 1)
+                console.log(result)
+                if (result.success != '') {
+                    logger.log({
+                        level: "info",
+                        message: "Successfully updated and set the status of the machine " + machineId
+                    })
+                    let result = {}
+                    result["success"] = "Successfully updated and set the status of the machine " + machineId
+                    return result
+
+                } else {
+                    logger.log({
+                        level: "error",
+                        message: "Failed to set the status of the machine" + machineId
+                    })
+                    let result = {}
+                    result["error"] = {}
+                    result["error"]["code"] = 500
+                    result["error"]["message"] = "Failed to set the status of the machine" + machineId
+                    return result
+                }
+            } else if (result == 1) {
+                let result = {}
+                result["success"] = "Successfully updated the status of defect "
+                return result
+            } else {
+                let result = {}
+                result["error"] = {}
+                result["error"]["code"] = 500
+                result["error"]["message"] = "Failed to set the status of the machine" + machineId
+                return result
+            }
+
+
+
             return dbConnecter.table('defect')
                 .update({ 'status': status })
                 .where({ 'machine_id': machineId })

@@ -9,6 +9,8 @@ var processInfoObj = new processInfo();
 
 const machineRepository = require('./repositories/machine-repository');
 const defectRepository = require('./repositories/defect-repository');
+const workerRegisteryRepository = require('./repositories/worker-registery-repository');
+const Constants = require('./utils/constants');
 
 class defectInfo {
 
@@ -16,6 +18,7 @@ class defectInfo {
 
     async getDefectInfo(machineId) {
         try {
+            //check machine exist
             let machine = await machineRepository.getMachineById(machineId);
 
             if (!machine) {
@@ -26,6 +29,7 @@ class defectInfo {
                 return result
             }
 
+            //get defct info
             let defect = await defectRepository.getDefectByMachineId(machineId);
             return defect;
 
@@ -43,8 +47,9 @@ class defectInfo {
     }
     async setDefect(personalNumber, description, machineId) {
         try {
-            let personalNumberExists = (await dbConnecter.table('worker_registry').count().where({ 'personal_number': personalNumber }).count())[0].count
-            if (personalNumberExists == 0) {
+            // check worker registery exist
+            let workerRegistery = await workerRegisteryRepository.getWorkerByPersonalNumber(personalNumber);
+            if (!workerRegistery) {
                 let result = {}
                 result["error"] = {}
                 result["error"]['code'] = 400
@@ -52,8 +57,9 @@ class defectInfo {
                 return result
             }
 
-            let machineIdExists = (await dbConnecter.table('machine').count().where({ 'machine_id': machineId }).count())[0].count
-            if (machineIdExists == 0) {
+            //check machine exist
+            let machine = await machineRepository.getMachineById(machineId);
+            if (!machine) {
                 let result = {}
                 result["error"] = {}
                 result["error"]['code'] = 400
@@ -61,6 +67,15 @@ class defectInfo {
                 return result
             }
 
+            //creating new defect
+            const model = {
+                personal_number: personalNumber,
+                description: description,
+                machine_id: machineId,
+                defect_time: moment().tz('Europe/Berlin').format('YYYYMMDD HHmmss'),
+                status: Constants.DEFECT_STATUS.FAILED
+            };
+            return await defectRepository.insertDefect(model);
             return dbConnecter.table('defect')
                 .insert({ 'personal_number': personalNumber, 'description': description, 'machine_id': machineId, 'defect_time': moment().tz('Europe/Berlin').format('YYYYMMDD HHmmss'), 'status': 1 })
                 .then(async (result, error) => {

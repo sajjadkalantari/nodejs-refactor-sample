@@ -1,4 +1,4 @@
-const { dbConnecter } = require("./dbConnector")
+const { dbConnecter } = require("../utils/dbConnector")
 
 class WorkerRegisteryRepository {
     constructor() {
@@ -6,7 +6,7 @@ class WorkerRegisteryRepository {
     }
 
     async getWorkerByPersonalNumber(personalNumber) {
-        return await dbConnecter.table(table).where({ 'personal_number': personalNumber });
+        return await dbConnecter.table(this.table).where({ 'personal_number': personalNumber });
     }
 }
 

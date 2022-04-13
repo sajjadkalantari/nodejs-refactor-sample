@@ -1,4 +1,4 @@
-const { dbConnecter } = require("./dbConnector")
+const { dbConnecter } = require("../utils/dbConnector")
 
 
 class MachineRepository {
@@ -7,7 +7,7 @@ class MachineRepository {
     }
 
     async getMachineById(machineId) {
-        return await dbConnecter.table(table).where({ 'machine_id': machineId }).first();
+        return await dbConnecter.table(this.table).where({ 'machine_id': machineId }).first();
     }
 }
 

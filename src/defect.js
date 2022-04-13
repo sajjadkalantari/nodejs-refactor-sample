@@ -140,94 +140,20 @@ class defectInfo {
 
             let result = await defectRepository.updateDefect(machineId, defect_time, status);
 
-            if (status == Constants.DEFECT_STATUS.Third && result == 1) {
-                let result = await mI.setMachineStatus(machineId, 1)
-                console.log(result)
-                if (result.success != '') {
-                    logger.log({
-                        level: "info",
-                        message: "Successfully updated and set the status of the machine " + machineId
-                    })
-                    let result = {}
-                    result["success"] = "Successfully updated and set the status of the machine " + machineId
-                    return result
+            if (result !== 1)
+                throw new ClientError(Constants.HTTP_CODE.INTERNAL_SERVER_ERROR, `Failed to set the status of the machine ${machineId}`);
 
-                } else {
-                    logger.log({
-                        level: "error",
-                        message: "Failed to set the status of the machine" + machineId
-                    })
-                    let result = {}
-                    result["error"] = {}
-                    result["error"]["code"] = 500
-                    result["error"]["message"] = "Failed to set the status of the machine" + machineId
-                    return result
-                }
-            } else if (result == 1) {
-                let result = {}
-                result["success"] = "Successfully updated the status of defect "
-                return result
-            } else {
-                let result = {}
-                result["error"] = {}
-                result["error"]["code"] = 500
-                result["error"]["message"] = "Failed to set the status of the machine" + machineId
-                return result
-            }
+            if (status !== Constants.DEFECT_STATUS.COMPLETED)
+                return { success: "Successfully updated the status of defect " };
 
+            let updateMachineResult = await mI.setMachineStatus(machineId, 1)
+            if (!updateMachineResult.success)
+                throw new ClientError(Constants.HTTP_CODE.INTERNAL_SERVER_ERROR, `Failed to set the status of the machine ${machineId}`);
 
+            let message = `Successfully updated and set the status of the machine ${machineId}`;
+            logger.log({ level: "info", message: message })
+            return { success: message };
 
-            return dbConnecter.table('defect')
-                .update({ 'status': status })
-                .where({ 'machine_id': machineId })
-                .andWhere({ 'defect_time': defect_time })
-                .then(async (result) => {
-                    console.log(result)
-                    if (status == '3' && result == 1) {
-                        let result = await mI.setMachineStatus(machineId, 1)
-                        console.log(result)
-                        if (result.success != '') {
-                            logger.log({
-                                level: "info",
-                                message: "Successfully updated and set the status of the machine " + machineId
-                            })
-                            let result = {}
-                            result["success"] = "Successfully updated and set the status of the machine " + machineId
-                            return result
-
-                        } else {
-                            logger.log({
-                                level: "error",
-                                message: "Failed to set the status of the machine" + machineId
-                            })
-                            let result = {}
-                            result["error"] = {}
-                            result["error"]["code"] = 500
-                            result["error"]["message"] = "Failed to set the status of the machine" + machineId
-                            return result
-                        }
-                    } else if (result == 1) {
-                        let result = {}
-                        result["success"] = "Successfully updated the status of defect "
-                        return result
-                    } else {
-                        let result = {}
-                        result["error"] = {}
-                        result["error"]["code"] = 500
-                        result["error"]["message"] = "Failed to set the status of the machine" + machineId
-                        return result
-                    }
-                }).catch((error) => {
-                    logger.log({
-                        level: 'error',
-                        message: error.toString(),
-                    })
-                    let result = {}
-                    result["error"] = {}
-                    result["error"]["code"] = 500
-                    result["error"]["message"] = error.toString()
-                    return result
-                })
         } catch (error) {
             logger.log({
                 level: 'error',

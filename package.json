@@ -5,8 +5,11 @@
   "main": "defect.js",
   "scripts": {
     "start": "node ../index.js",
-    "test": "jest --watchAll --verbose"    
+    "test": "jest --watchAll --verbose"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^27.5.1"
+  }
 }

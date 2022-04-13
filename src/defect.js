@@ -7,15 +7,18 @@ var mI = new machineInfo();
 const { processInfo } = require("./process");
 var processInfoObj = new processInfo();
 
+const machineRepository = require('./repositories/machine-repository');
+const defectRepository = require('./repositories/defect-repository');
+
 class defectInfo {
 
     constructor() { }
 
     async getDefectInfo(machineId) {
         try {
-            let machineExist = (await dbConnecter.table('machine').where({ 'machine_id': machineId }).count())[0].count
+            let machine = await machineRepository.getMachineById(machineId);
 
-            if (machineExist != 1) {
+            if (!machine) {
                 let result = {}
                 result["error"] = {}
                 result["error"]["code"] = 400
@@ -23,23 +26,9 @@ class defectInfo {
                 return result
             }
 
+            let defect = await defectRepository.getDefectByMachineId(machineId);
+            return defect;
 
-            return dbConnecter.table('defect')
-                .where({ 'machine_id': machineId })
-                .then(async (result) => {
-                    return result;
-                })
-                .catch((error) => {
-                    logger.log({
-                        level: 'error',
-                        message: error.toString(),
-                    })
-                    let result = {}
-                    result["error"] = {}
-                    result["error"]["code"] = 500
-                    result["error"]["message"] = error.toString()
-                    return result
-                })
         } catch (error) {
             logger.log({
                 level: 'error',

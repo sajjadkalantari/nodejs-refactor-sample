@@ -1,12 +1,10 @@
-const { dbConnecter } = require("./dbConnector")
-const { logger } = require("./logger");
 const moment = require('moment-timezone');
+const Constants = require('../utils/constants');
+const { logger } = require("./logger");
 const { machineInfo } = require("./machine");
-
 const { MachineRepository } = require('../repositories/machine-repository');
 const { DefectRepository } = require('../repositories/defect-repository');
 const { WorkerRegisteryRepository } = require('../repositories/worker-registery-repository');
-const Constants = require('../utils/constants');
 const { ClientError } = require('../utils/error')
 
 class defectInfoService {

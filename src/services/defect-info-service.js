@@ -3,13 +3,13 @@ const { logger } = require("./logger");
 const moment = require('moment-timezone');
 const { machineInfo } = require("./machine");
 
-const machineRepository = require('./repositories/machine-repository');
-const defectRepository = require('./repositories/defect-repository');
-const workerRegisteryRepository = require('./repositories/worker-registery-repository');
-const Constants = require('./utils/constants');
-const { ClientError } = require('./utils/error')
+const machineRepository = require('../repositories/machine-repository');
+const defectRepository = require('../repositories/defect-repository');
+const workerRegisteryRepository = require('../repositories/worker-registery-repository');
+const Constants = require('../utils/constants');
+const { ClientError } = require('../utils/error')
 
-class defectInfo {
+class defectInfoService {
 
     constructor() {
         this.mI = new machineInfo();
@@ -104,5 +104,5 @@ class defectInfo {
 }
 
 module.exports = {
-    defectInfo
+    defectInfoService
 }

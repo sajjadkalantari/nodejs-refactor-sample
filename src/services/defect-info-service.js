@@ -5,7 +5,7 @@ const { machineInfo } = require("./machine");
 const { MachineRepository } = require('../repositories/machine-repository');
 const { DefectRepository } = require('../repositories/defect-repository');
 const { WorkerRegisteryRepository } = require('../repositories/worker-registery-repository');
-const { ClientError } = require('../utils/error')
+const { ClientError } = require('../utils/error-model')
 
 class DefectInfoService {
 
@@ -23,6 +23,12 @@ class DefectInfoService {
 
     }
 
+    async ValidateWorkerRegisteryExist(personalNumber) {
+        let workerRegistery = await workerRegisteryRepository.getWorkerByPersonalNumber(personalNumber);
+        if (!workerRegistery)
+            throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Invalid personal number");
+    }
+
     async getDefectInfo(machineId) {
         //check machine exist
         await ValidateMachineExist(machineId);
@@ -36,10 +42,8 @@ class DefectInfoService {
         //check machine exist
         await ValidateMachineExist(machineId);
 
-        // check worker registery exist
-        let workerRegistery = await workerRegisteryRepository.getWorkerByPersonalNumber(personalNumber);
-        if (!workerRegistery)
-            throw new ClientError(Constants.HTTP_CODE.NOT_FOUND, "Invalid personal number");
+        //check worker registery exist
+        await ValidateWorkerRegisteryExist(personalNumber);
 
         //creating new defect
         const model = {

@@ -4,7 +4,8 @@
   "description": "The `defect.js` contains logic on how to report a defect of a machine, which is reported by a worker.",
   "main": "defect.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ../index.js",
+    "test": "jest --watchAll --verbose"    
   },
   "author": "",
   "license": "ISC"

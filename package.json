@@ -1,0 +1,11 @@
+{
+  "name": "code-challenge-senior-backend-master",
+  "version": "1.0.0",
+  "description": "The `defect.js` contains logic on how to report a defect of a machine, which is reported by a worker.",
+  "main": "defect.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

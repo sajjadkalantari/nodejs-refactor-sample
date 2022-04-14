@@ -5,7 +5,9 @@
   "main": "defect.js",
   "scripts": {
     "start": "node ../index.js",
-    "test": "jest --watchAll --verbose"
+    "start:dev": "nodemon ../index.js",
+    "test": "jest --watchAll --verbose",
+    "test:cov": "jest --coverage"
   },
   "author": "",
   "license": "ISC",

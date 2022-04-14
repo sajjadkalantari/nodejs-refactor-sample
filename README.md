@@ -6,7 +6,7 @@ Note: The example-db.sql is just a snippet of the database and should support th
 
 ## Before-refactor
 
-in this folder you will find firs version of the defect.js
+in this folder you will find first version of the defect.js
 
 ## After-refactor
 
